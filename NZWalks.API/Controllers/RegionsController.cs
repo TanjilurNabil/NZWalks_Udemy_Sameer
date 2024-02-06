@@ -57,13 +57,21 @@ namespace NZWalks.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AddRegionRequestDto addRegionRequestDto)
         {
-            //Map DTo to Domain
-            var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
-            //Create Region
-            regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
-            //Map Domain back to DTO
-            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
-            return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
+            if (ModelState.IsValid)
+            {
+                //Map DTo to Domain
+                var regionDomainModel = mapper.Map<Region>(addRegionRequestDto);
+                //Create Region
+                regionDomainModel = await regionRepository.CreateAsync(regionDomainModel);
+                //Map Domain back to DTO
+                var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+                return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+            
         }
         //Update region
         //PUT https://localhost:port/api/region/{id}
@@ -71,18 +79,26 @@ namespace NZWalks.API.Controllers
         [Route("{id:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegion)
         {
-            //Map DTo to Domain Model
-            var regionDomainModel = mapper.Map<Region>(updateRegion);
-            //Check If region exists
-            regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
-            if (regionDomainModel == null)
+            if(ModelState.IsValid)
             {
-                return NotFound();
-            }
+                //Map DTo to Domain Model
+                var regionDomainModel = mapper.Map<Region>(updateRegion);
+                //Check If region exists
+                regionDomainModel = await regionRepository.UpdateAsync(id, regionDomainModel);
+                if (regionDomainModel == null)
+                {
+                    return NotFound();
+                }
 
-            //Convert Domain to DTO
-            var regionDto = mapper.Map<RegionDto>(regionDomainModel);
-            return Ok(regionDto);
+                //Convert Domain to DTO
+                var regionDto = mapper.Map<RegionDto>(regionDomainModel);
+                return Ok(regionDto);
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+            
 
         }
         [HttpDelete]
