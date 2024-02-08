@@ -26,14 +26,28 @@ namespace NZWalks.API.Repositories.Implemantation
             {
                 return null;
             }
-             _dbContext.Walks.Remove(existingWalk);
+            _dbContext.Walks.Remove(existingWalk);
             await _dbContext.SaveChangesAsync();
             return existingWalk;
         }
 
-        public async Task<List<Walk>> GetAllAsync()
+        public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null)
         {
-            return await _dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
+            var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+            //Filtering
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))//StringComparison.OrdinalIgnoreCase this will ignore case sensitivity of Name
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                else if (filterOn.Equals("Description", StringComparison.OrdinalIgnoreCase))
+                {
+                    walks = walks.Where(x => x.Description.Contains(filterQuery));
+                }
+
+            }
+
+            return await walks.ToListAsync();
+            //return await _dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
             //Inside Include it can be also written as Include(x=>x.Difficulty) which is more type safe. 
             // But we will keep it loke that because we will make this repository generic leter 
         }
@@ -48,7 +62,8 @@ namespace NZWalks.API.Repositories.Implemantation
         public async Task<Walk?> UpdateAsync(Guid id, Walk walk)
         {
             var existingWalk = await _dbContext.Walks.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingWalk == null) {
+            if (existingWalk == null)
+            {
 
                 return null;
             }
