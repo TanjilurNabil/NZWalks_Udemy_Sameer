@@ -32,7 +32,7 @@ namespace NZWalks.API.Repositories.Implemantation
         }
 
         public async Task<List<Walk>> GetAllAsync(string? filterOn = null, string? filterQuery = null,
-            string? sortBy = null, bool isAscending = true)
+            string? sortBy = null, bool isAscending = true,int pageNumber= 1, int pageSize = 1000)
         {
             var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
             //Filtering
@@ -58,8 +58,10 @@ namespace NZWalks.API.Repositories.Implemantation
                     walks = isAscending ? walks.OrderBy(x => x.LengthInKm) : walks.OrderByDescending(x => x.LengthInKm);
                 }
             }
+            //Pagination
+            var skipResult = (pageNumber - 1) * pageSize;
 
-            return await walks.ToListAsync();
+            return await walks.Skip(skipResult).Take(pageSize).ToListAsync();
             //return await _dbContext.Walks.Include("Difficulty").Include("Region").ToListAsync();
             //Inside Include it can be also written as Include(x=>x.Difficulty) which is more type safe. 
             // But we will keep it loke that because we will make this repository generic leter 
