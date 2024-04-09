@@ -18,8 +18,12 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<NZWalksDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksConnectionString")));
+
+
 builder.Services.AddDbContext<NzWalksAuthDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("NZWalksAuthConnectionString")));
+
+
 builder.Services.AddScoped<IRegionRepository, SqlRegionRepository>();
 builder.Services.AddScoped<IWalkRepository, SqlWalkRepository>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
@@ -28,7 +32,7 @@ builder.Services.AddIdentityCore<IdentityUser>()
     .AddRoles<IdentityRole>()
     .AddTokenProvider<DataProtectorTokenProvider<IdentityUser>>("NzWalks")
     .AddEntityFrameworkStores<NzWalksAuthDbContext>()
-    .AddDefaultTokenProviders();
+    .AddDefaultTokenProviders(); 
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

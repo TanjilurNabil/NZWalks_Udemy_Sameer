@@ -11,7 +11,7 @@ namespace NZWalks.API.Controllers
     {
         private readonly UserManager<IdentityUser> userManager;
 
-        public AuthController(UserManager<IdentityUser> userManager )
+        public AuthController(UserManager<IdentityUser> userManager)
         {
             this.userManager = userManager;
         }
@@ -20,20 +20,25 @@ namespace NZWalks.API.Controllers
         [Route("Register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto registerRequestDto)
         {
-            var identityUser = new IdentityUser {
+            var identityUser = new IdentityUser
+            {
                 UserName = registerRequestDto.Username,
                 Email = registerRequestDto.Username
             };
-            var identityResult =  await userManager.CreateAsync(identityUser, registerRequestDto.Password);
+            var identityResult = await userManager.CreateAsync(identityUser, registerRequestDto.Password);
 
             if (identityResult.Succeeded)
             {
                 //Add roles to this user
-                identityResult =  await userManager.AddToRolesAsync(identityUser, registerRequestDto.Roles);
-                if(identityResult.Succeeded)
+                if (registerRequestDto.Roles != null && registerRequestDto.Roles.Any())
                 {
-                    return Ok("User was registered!! Please login.");
+                    identityResult = await userManager.AddToRolesAsync(identityUser, registerRequestDto.Roles);
+                    if (identityResult.Succeeded)
+                    {
+                        return Ok("User was registered!! Please login.");
+                    }
                 }
+
             }
             return BadRequest("Something went wrong");
         }
@@ -42,10 +47,10 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> Login(LoginRequestDto loginRequestDto)
         {
             var user = await userManager.FindByEmailAsync(loginRequestDto.Username);
-            if(user!= null)
+            if (user != null)
             {
                 //Check password 
-                var checkPasswordResult =  await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
+                var checkPasswordResult = await userManager.CheckPasswordAsync(user, loginRequestDto.Password);
                 if (checkPasswordResult)
                 {
                     //Create Token
