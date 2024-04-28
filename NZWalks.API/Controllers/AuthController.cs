@@ -62,9 +62,14 @@ namespace NZWalks.API.Controllers
                     {
                         //Create Token
                         var jwtToken =  tokenRepository.CreateJWTToken(user, roles.ToList());
+                        var response = new LoginResponseDto
+                        {
+                            JwtToken = jwtToken
+                        };
+                        return Ok(response);
                     }
                     
-                    return Ok();
+                    
                 }
             }
             return BadRequest("Username or Password incorrect");
