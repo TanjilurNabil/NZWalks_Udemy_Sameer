@@ -1,5 +1,6 @@
 
 using AutoMapper;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NZWalks.API.Controllers;
@@ -42,10 +43,19 @@ namespace TestProject1
             var result = await regionController.GetAll();
 
             //Assert
+            //Fluent
+
+
+            //result.Should().BeOfType<List<RegionDto>>();
+            //result.Should().NotBeNull();
+
+
+
+            //XUnit default Assertion
             var okResult = Assert.IsType<OkObjectResult>(result);
             var returndRegionDto = Assert.IsType<List<RegionDto>>(okResult.Value);
-            Assert.Equal(regionsDto.Count,returndRegionDto.Count);
-            
+            Assert.Equal(regionsDto.Count, returndRegionDto.Count);
+
         }
         [Fact]
         public async Task Should_Create_Region_Successfully()
