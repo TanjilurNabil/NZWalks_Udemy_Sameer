@@ -36,6 +36,7 @@ namespace NZWalks.API.Data
                 {
                     Id = Guid.Parse("2e8767dd-bf73-494e-8a89-27f5bb3053e6"),
                     Name = "Hard"
+
                 }
             };
             //Seed Difficulties to database
